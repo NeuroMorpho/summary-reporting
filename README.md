@@ -1,5 +1,5 @@
-Summary Reporting Backend
-=========================
+Summary Reporting
+=================
 Research and requirements: Masood Akram, Giorgio Ascoli
 System development: Navy Merianda, Praveen Menon 
 Project management and deployment: Bengt Ljungquist
