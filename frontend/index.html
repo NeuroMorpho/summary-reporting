@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>NeuroMorpho.Org</title>
+	<link rel="stylesheet" type="text/css" href="assets/css/semantic.min.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/main.css">
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"
+		integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+	<script src="assets/js/semantic.min.js"></script>
+	<script src="assets/js/clipboard.min.js"></script>
+
+</head>
+
+<body style="background-color:#FCFFDF">
+	<div class="ui container">
+		<div class="ui block header center aligned"
+			style="background: url(assets/images/BannerBG2.png) no-repeat; height:120px;width:800px;margin-left: 150px;margin-top: 12px;">
+			<div class="content">
+				<div class="sub header" style="font-size: 1.1rem;font-weight: bold;margin-top: 76px;color: black;">
+					Version: 7.9 - Released: 12/13/2019 - Content: 121578 neurons </div>
+			</div>
+			<div class="line-strip"
+				style="height:0px;margin-left: -1rem;margin-top:1rem; margin-right: -1rem;width:798px;">
+			</div>
+			<div class="ui huge menu" style="font-size: 0.90rem; margin-left: -1rem;margin-top:0rem; margin-right: -1rem;background-color: #C2732E
+				;font-family: Verdana, Arial, tahoma, helvetica, arial,sans-serif;">
+				<div class="ui dropdown item">
+					HOME <i class="dropdown icon"></i>
+					<div class="menu">
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/index.jsp" class="item">Homepage</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/about.jsp" class="item">About</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/WIN.jsp" class="item">What's new</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/useterm.jsp" class="item">Terms of use</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/statistics.jsp" class="item">Detailed
+							Statistics</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/acknowl.jsp"
+							class="item">Acknowledgements</a>
+					</div>
+				</div>
+				<div class="ui dropdown item">
+					BROWSE <i class="dropdown icon"></i>
+					<div class="menu">
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/byspecies.jsp" class="item">By animal
+							species</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/byregion.jsp" class="item">By brain
+							region</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/bycell.jsp" class="item">By cell
+							types</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/bylab.jsp" class="item">By archive</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/byRandom.jsp" class="item">Random
+							neurons</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/LS_Video.jsp" class="item">Neuron Atlas</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/DownloadNeuronRelatedFiles.jsp"
+							class="item">Download
+							cart</a>
+					</div>
+				</div>
+				<div class="ui dropdown item" style="background-color:  #E4CD39">
+					SEARCH <i class="dropdown icon"></i>
+					<div class="menu">
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/MetaData.jsp" class="item">Metadata</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/MorphoMetrySearch.jsp"
+							class="item">Morphometry</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/KeywordSearch.jsp" class="item">Keywords</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/OntoSearch.jsp" class="item">OntoSearch</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/api.jsp" class="item">API</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/DownloadNeuronRelatedFiles.jsp"
+							class="item">Download cart</a>
+						<a href="http://cng.gmu.edu:8080/neuronMetadata" class="item">Generate
+							report</a>
+					</div>
+				</div>
+				<div class="ui dropdown item">
+					LITERATURE COVERAGE <i class="dropdown icon"></i>
+					<div class="menu">
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/LS.jsp" class="item">Literature
+							search</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/LS_availability.jsp" class="item">Data
+							availability</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/CFD.jsp" class="item">Call for
+							data</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/LS_usage.jsp" class="item">Data usage</a>
+					</div>
+				</div>
+				<a href="http://cng.gmu.edu:8080/neuroMorphoReview/useterm.jsp" class="item">
+					TERMS OF USE
+				</a>
+				<div class="ui dropdown item">
+					HELP <i class="dropdown icon"></i>
+					<div class="menu">
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/main_help.jsp" class="item">Quickstart</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/myfaq.jsp" class="item">FAQs</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/tools.jsp" class="item">Tools &
+							Links</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/known_issues.jsp" class="item">Known
+							Issues</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/emailForm.jsp" class="item">Contact Us</a>
+						<a href="http://cng.gmu.edu:8080/neuroMorphoReview/sitemap.jsp" class="item">Site Map</a>
+					</div>
+				</div>
+				<a href="http://cng.gmu.edu:8080/neuroMorphoReview/DownloadNeuronRelatedFiles.jsp">
+					<div class="download-icon"
+						style="background: url(assets/images/download.png) no-repeat;height: 15px;width: 15px;margin-top: 10px;margin-left: 6px;">
+					</div>
+				</a>
+				<div class="cart-number" style="height:20px;width:20px;margin-top:11px;font-weight: bold;">0</div>
+			</div>
+		</div>
+		<div class="line-strip-yellow"
+			style="height:18px;margin-left: 151px;margin-top:2rem;border-bottom:solid 12px #E4CD39;width:798px;">
+		</div>
+		<div class="line-strip-presentpage"
+			style="height:18px;margin-left: 151px;margin-top:0rem;border-bottom:solid 20px rgb(239, 243, 199);width:798px;">
+			<p
+				style="color: rgb(193, 116, 48);font-family: Verdana, Arial, tahoma, helvetica, arial,sans-serif;font-size: small;margin-left: 1.5rem;">
+				Search > Generate Report</p>
+		</div>
+
+		<div class=" ui two column grid" style="margin-top: 0rem; width: 59rem; margin-left: 10rem;">
+			<div class="row">
+				<div class="column">
+					<div id="speciesIndex">
+						<select name="Species" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+							multiple="" id="species">
+							<option value="">Species</option>
+						</select>
+					</div>
+
+					<select name="Gender" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="gender">
+						<option value="">Gender</option>
+					</select>
+					<select name="min_weight" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="min_weight">
+						<option value="">Minimum Weight</option>
+					</select>
+
+					<select name="max_weight" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="max_weight">
+						<option value="">Maximum Weight</option>
+					</select>
+					<select name="age_classification"
+						class="retrieve-fields ui fluid search multi-select dropdown hidden" multiple=""
+						id="age_classification">
+						<option value="">Development</option>
+					</select>
+
+					<select name="min_age" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="min_age">
+						<option value="">Minimum Age</option>
+					</select>
+
+					<select name="max_age" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="max_age">
+						<option value="">Maximum Age</option>
+					</select>
+				</div>
+
+				<div class="column">
+					<select name="protocol" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="protocol">
+						<option value="">Protocol</option>
+					</select>
+
+					<select name="experiment_condition"
+						class="retrieve-fields ui fluid search multi-select dropdown hidden" multiple=""
+						id="experiment_condition">
+						<option value="">Experiment Condition</option>
+					</select>
+
+					<select name="stain" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="stain">
+						<option value="">Stain</option>
+					</select>
+
+					<select name="slicing_thickness"
+						class="retrieve-fields ui fluid search multi-select dropdown hidden" multiple=""
+						id="slicing_thickness">
+						<option value="">Slicing Thickness</option>
+					</select>
+
+					<select name="slicing_direction"
+						class="retrieve-fields ui fluid search multi-select dropdown hidden" multiple=""
+						id="slicing_direction">
+						<option value="">Slicing Direction</option>
+					</select>
+
+					<select name="reconstruction_software"
+						class="retrieve-fields ui fluid search multi-select dropdown hidden" multiple=""
+						id="reconstruction_software">
+						<option value="">Reconstruction Software</option>
+					</select>
+
+					<select name="objective_type" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="objective_type">
+						<option value="">Objective Type</option>
+					</select>
+
+					<select name="magnification" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="magnification">
+						<option value="">Objective Magnification</option>
+					</select>
+
+
+				</div>
+			</div>
+
+			<div class="row">
+
+				<div class="column">
+					<select name="brain_region" class="ui fluid search multi-select dropdown" multiple=""
+						id="brain_region_1">
+						<option value="">Brain Region Level 1</option>
+					</select>
+
+					<select name="brain_region" class="ui fluid search multi-select dropdown" multiple=""
+						id="brain_region_2">
+						<option value="">Brain Region Level 2</option>
+					</select>
+
+					<select name="brain_region" class="ui fluid search multi-select dropdown" multiple=""
+						id="brain_region_3">
+						<option value="">Brain Region Level 3</option>
+					</select>
+
+					<select name="cell_type_1" class="ui fluid search multi-select dropdown" multiple=""
+						id="cell_type_1">
+						<option value="">Cell Type Level 1</option>
+					</select>
+					<select name="cell_type_2" class="ui fluid search multi-select dropdown" multiple=""
+						id="cell_type_2">
+						<option value="">Cell Type Level 2</option>
+					</select>
+					<select name="cell_type_3" class="ui fluid search multi-select dropdown" multiple=""
+						id="cell_type_3">
+						<option value="">Cell Type Level 3</option>
+					</select>
+
+				</div>
+
+
+
+				<div class="column">
+					<select name="archive" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="archive">
+						<option value="">Archive</option>
+					</select>
+
+					<select name="reference_pmid" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="reference_pmid">
+						<option value="">PMID</option>
+					</select>
+
+					<select name="original_format" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="original_format">
+						<option value="">Original Format</option>
+					</select>
+
+					<select name="deposition_date" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="deposition_date">
+						<option value="">Date of Deposition</option>
+					</select>
+
+					<select name="upload_date" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="upload_date">
+						<option value="">Date of Upload</option>
+					</select>
+				</div>
+
+			</div>
+
+			<div class="row">
+
+				<div class="column">
+					<select name="domain" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="domain">
+						<option value="">Structural Domain</option>
+					</select>
+					<select name="Physical_Integrity"
+						class="retrieve-fields ui fluid search multi-select dropdown hidden" multiple=""
+						id="Physical_Integrity">
+						<option value="">Physical Integrity</option>
+					</select>
+
+					<select name="attributes" class="retrieve-fields ui fluid search multi-select dropdown hidden"
+						multiple="" id="attributes">
+						<option value="">Morphological Attributes</option>
+					</select>
+				</div>
+
+			</div>
+
+			<div class="ui container center aligned segment main-buttons" style="width: 57rem;">
+				<button class="ui labeled icon button" id="reset" style="background-color:#FCCF61" type="reset">
+					<i class="undo icon"></i>
+					Reset
+				</button>
+				<button class="ui right labeled icon button" id="hits" style="background-color:#FCCF61">
+					<i class="right arrow icon"></i>
+					Hits
+				</button>
+				<!-- <button class="ui right labeled icon button" id="generateQuery" style="background-color:#FCCF61">
+					<i class="right arrow icon"></i>
+					Generate Query
+				</button> -->
+				<!-- <button id="db" class="ui toggle button active">NeuMO</button> -->
+
+
+
+
+
+			</div>
+			<a id="dlink" style="display:none;"></a>
+			<div class="ui modal longer fullscreen" id="viewTable">
+				<div class="actions">
+					<div class="ui red basic cancel button">
+						<i class="remove icon"></i>
+						Close
+					</div>
+					<div class="ui blue basic cancel button download-table">
+						<i class="download icon"></i>
+						Download
+					</div>
+				</div>
+				<div class="scrolling content">
+					<div id="tablePrint"></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="ui basic modal" id="hitsResult">
+			<div class="content">
+				<p id="count"></p>
+			</div>
+			<div class="actions">
+				<div class="fluid ui large buttons">
+					<button class="ui cancel button" id="view" style="background-color:#FCCF61">View</button>
+					<div class="ui cancel button" id="typeButton" style="background-color:#FCCF61">
+						<select class="ui simple dropdown item" id="type_of_data">
+							<option value="">Type of Data</option>
+							<option value="1">Groups</option>
+							<option value="2">Morphometrics</option>
+							<option value="3">Persistence Vectors</option>
+							<option value="4">All</option>
+						</select>
+					</div>
+					<button class="ui cancel button download-table" id="download"
+						style="background-color:#FCCF61">Download</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="ui basic modal" id="showQuery">
+			<div class="content">
+				<p id="query"></p>
+				<button class="btn ui teal right labeled icon button" data-clipboard-target="#query">
+					<i class="copy icon"></i>
+					Copy
+				</button>
+			</div>
+		</div>
+
+		<div id="loader"></div>
+		<!-- <div class="ui segment">
+			<div class="ui active inverted dimmer">
+				<div class="ui text loader">Loading</div>
+			</div>
+			<p></p>
+		</div> -->
+		<script src="assets/js/main.js"></script>
+</body>
+
+</html>
