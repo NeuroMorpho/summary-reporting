@@ -20,3 +20,7 @@ Known issues
 ------------
 There is currently may be a delay in the population of the drop down boxes after the first page load. 
 
+Limitations
+-----------
+Please note that direct access the NeuroMorpho database is not provided for security reasons. The backend therefore cannot run standalone.
+
