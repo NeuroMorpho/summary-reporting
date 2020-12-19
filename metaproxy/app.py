@@ -16,7 +16,17 @@ def makeapirequest(field):
     Makes api request 
     """
     r = requests.get('http://neuromorpho.org/api/neuron/fields/{}'.format(field))
-    return json.loads(r.text)
+    
+    result = json.loads(r.text)
+    npages = result["page"]["totalPages"]
+    if npages > 1:
+        for ix in range(1,npages):
+            r = requests.get('http://neuromorpho.org/api/neuron/fields/{}?page={}'.format(field,ix))
+            nextresult = json.loads(r.text)
+            result["fields"] = result["fields"] + nextresult["fields"]
+
+    del result["page"]
+    return result
 
 
 @app.route('/')
