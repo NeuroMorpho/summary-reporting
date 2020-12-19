@@ -1,8 +1,8 @@
-Summary Reporting Backend
-=========================
-Research and requirements: Masood Akram, Giorgio Ascoli
-System development: Navy Merianda, Praveen Menon 
-Project management and deployment: Bengt Ljungquist
+Summary Reporting
+=================
+- Research and requirements: Masood Akram, Giorgio Ascoli
+- System development: Navy Merianda, Praveen Menon 
+- Project management and deployment: Bengt Ljungquist
 
 General description
 -------------------
