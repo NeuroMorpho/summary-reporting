@@ -460,8 +460,35 @@ function getMorphoForNeurons(ids) {
 	});
 }
 
+var fieldvals = {};
+function generatefieldvalues() {
+	$.ajax({
+		url: 'http://cng-nmo-main.orc.gmu.edu/metaproxy/',
+		error: function () {
+			$('#info').html('<p>An error has occurred</p>');
+		},
+		success: function (data) {
+			fieldvals = JSON.parse(data);
+			var datakeys = Object.keys(fieldvals);			
+			for (var i = 0; i < datakeys.length; i++) {
+				var doc = document.getElementById(datakeys[i]);
+				arr = fieldvals[datakeys[i]].fields
+				for (var j = 0; j < arr.length; j++) {
+					var option = document.createElement("option");
+					option.text = arr[j];
+					option.value = arr[j];
+					doc.appendChild(option);
+				}
+			}
+		},
+		type: 'GET'
+	});
+}
+
+generatefieldvalues();
+
 //Retrieve additional field values other than brain_region and cell types.
-function retrieveFieldValues(field) {
+/* function retrieveFieldValues(field) {
 	$.ajax({
 		url: 'http://neuromorpho.org/api/neuron/fields/' + field,
 		error: function () {
@@ -479,16 +506,16 @@ function retrieveFieldValues(field) {
 		},
 		type: 'GET'
 	});
-}
+} 
 
 
 $(".retrieve-fields").each(function () {
 	retrieveFieldValues(this.firstChild.id);
-});
+});*/
 document.getElementById("loader").style.display = "none";
 
 //Retrieve additional field values for brain_region and cell types.
-function retrieveBrainRegionCellTypeValues(field) {
+/* function retrieveBrainRegionCellTypeValues(field) {
 	$.ajax({
 		url: "http://neuromorpho.org/api/neuron/fields/" + field,
 		error: function () {
@@ -516,5 +543,5 @@ retrieveBrainRegionCellTypeValues("brain_region_2");
 retrieveBrainRegionCellTypeValues("cell_type_2");
 
 retrieveBrainRegionCellTypeValues("brain_region_3");
-retrieveBrainRegionCellTypeValues("cell_type_3");
+retrieveBrainRegionCellTypeValues("cell_type_3"); */
 
