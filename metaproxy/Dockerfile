@@ -17,12 +17,6 @@ RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
 # copy files required for the app to run
 COPY app.py /app/
-#COPY pvec_cache.pkl /app/
-#COPY pvecmes_cache.pkl /app/
-#COPY sum_cache.pkl /app/
-#COPY meta_cache.pkl /app/
-#COPY detailed_cache.pkl /app/
-#COPY detailedpvec_cache.pkl /app/
 
 ENTRYPOINT [ "flask" ]
 
