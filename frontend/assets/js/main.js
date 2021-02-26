@@ -9,6 +9,10 @@ $('.ui.dropdown').dropdown();
 var metaDataObj = {}, neuron = {}, results = [], pvecResults = [], morphoResults = [],
 	selectedDownloadValue = "0", viewClick = true;
 
+var baseurl = 'http://cng.gmu.edu:8080/'; // baseurl for CNG server, modify if deployed elsewhere
+var appbaseurl = 'http://cng-nmo-main.orc.gmu.edu/'; // baseurl for app server, modify if deployed elsewhere
+var apiurl = 'http://neuromorpho.org/api/'; //baseurl for NeuroMorpho API, modify if deployed elsewhere
+
 new ClipboardJS('.btn');
 
 //Incase of switching between any DBs.
@@ -139,7 +143,7 @@ var getCount = function () {
 	metaDataObj = getMetaData();
 
 	$.ajax({
-		url: 'http://cng.gmu.edu:8080/searchServiceReview/metadata/count',
+		url: baseurl + 'searchServiceReview/metadata/count',
 		error: function () {
 			$('#info').html('<p>An error has occurred<div class="scrolling content"></p>');
 		},
@@ -204,7 +208,7 @@ var gethits = function () {
 
 	if (viewClick) {
 		$.ajax({
-			url: 'http://cng.gmu.edu:8080/searchServiceReview/metadata/neuronIds',
+			url: baseurl + 'searchServiceReview/metadata/neuronIds',
 			error: function () {
 				$('#info').html('<p>An error has occurred<div class="scrolling content"></p>');
 			},
@@ -256,7 +260,7 @@ var gethits = function () {
 		
 		//End-point for generating report - deployed in a docker container
 		var promise = $.ajax({
-			url: 'http://129.174.10.74/genRepNew/generateReport',
+			url:  appbaseurl + 'genRepNew/generateReport',
 			dataType: "json",
 			contentType: 'application/json',
 			type: 'GET',
@@ -276,13 +280,13 @@ var gethits = function () {
 		//Retrieve the report based on the option selected - groups, morpho or pvec.
 		promise.then(function (data) {
 			if (selectedDownloadValue == "Groups")
-				window.location = 'http://129.174.10.74/genRepNew/generateReport/download/groups_' + timestamp + '.csv'
+				window.location = appbaseurl + 'genRepNew/generateReport/download/groups_' + timestamp + '.csv'
 			else if (selectedDownloadValue == "Morphometrics")
-				window.location = 'http://129.174.10.74/genRepNew/generateReport/download/morpho_' + timestamp + '.csv'
+				window.location = appbaseurl + 'genRepNew/generateReport/download/morpho_' + timestamp + '.csv'
 			else if (selectedDownloadValue == "Persistence Vectors")
-				window.location = 'http://129.174.10.74/genRepNew/generateReport/download/pvec_' + timestamp + '.csv'
+				window.location = appbaseurl + 'genRepNew/generateReport/download/pvec_' + timestamp + '.csv'
 			else if (selectedDownloadValue == "All")
-				window.location = 'http://129.174.10.74/genRepNew/generateReport/download/all_' + timestamp + '.zip'
+				window.location = appbaseurl + 'genRepNew/generateReport/download/all_' + timestamp + '.zip'
 
 			$("#download").html('Download');
 
@@ -412,7 +416,7 @@ function stringifyIds(data) {
 //Get neurons for displaying in view option.
 function getNeurons(ids) {
 	$.ajax({
-		url: 'http://neuromorpho.org/api/neuron/select?q=neuron_id:' + ids + '&page=0&size=500',
+		url: apiurl + 'neuron/select?q=neuron_id:' + ids + '&page=0&size=500',
 		async: false,
 		error: function () {
 			$('#info').html('<p>An error has occurred</p>');
@@ -429,7 +433,7 @@ function getNeurons(ids) {
 //Get pvec data for displaying in view option.
 function getPvecForNeurons(ids) {
 	$.ajax({
-		url: 'http://cng.gmu.edu:8080/api/pvec/select?q=neuron_id:' + ids + '&page=0&size=500',
+		url: apiurl + 'pvec/select?q=neuron_id:' + ids + '&page=0&size=500',
 		async: false,
 		error: function () {
 			$('#info').html('<p>An error has occurred</p>');
@@ -446,7 +450,7 @@ function getPvecForNeurons(ids) {
 //Get morpho data for displaying in view option.
 function getMorphoForNeurons(ids) {
 	$.ajax({
-		url: 'http://cng.gmu.edu:8080/api/morphometry/select?q=Neuron_id:' + ids + '&page=0&size=500',
+		url: apiurl + 'morphometry/select?q=Neuron_id:' + ids + '&page=0&size=500',
 		async: false,
 		error: function () {
 			$('#info').html('<p>An error has occurred</p>');
@@ -463,7 +467,7 @@ function getMorphoForNeurons(ids) {
 var fieldvals = {};
 function generatefieldvalues() {
 	$.ajax({
-		url: 'http://cng-nmo-main.orc.gmu.edu/metaproxy/',
+		url: appbaseurl + 'metaproxy/',
 		error: function () {
 			$('#info').html('<p>An error has occurred</p>');
 		},
@@ -487,61 +491,10 @@ function generatefieldvalues() {
 
 generatefieldvalues();
 
-//Retrieve additional field values other than brain_region and cell types.
-/* function retrieveFieldValues(field) {
-	$.ajax({
-		url: 'http://neuromorpho.org/api/neuron/fields/' + field,
-		error: function () {
-			$('#info').html('<p>An error has occurred</p>');
-		},
-		success: function (data) {
-			var arr = data.fields;
-			var doc = document.getElementById(field);
-			for (var i = 0; i < arr.length; i++) {
-				var option = document.createElement("option");
-				option.text = arr[i];
-				option.value = arr[i];
-				doc.appendChild(option);
-			}
-		},
-		type: 'GET'
-	});
-} 
 
-
-$(".retrieve-fields").each(function () {
+/*$(".retrieve-fields").each(function () {
 	retrieveFieldValues(this.firstChild.id);
 });*/
 document.getElementById("loader").style.display = "none";
 
-//Retrieve additional field values for brain_region and cell types.
-/* function retrieveBrainRegionCellTypeValues(field) {
-	$.ajax({
-		url: "http://neuromorpho.org/api/neuron/fields/" + field,
-		error: function () {
-			$('#info').html('<p>An error has occurred</p>');
-		},
-		success: function (data) {
-			var arr = data.fields;
-			var doc = document.getElementById(field);
-
-			for (var i = 0; i < arr.length; i++) {
-				var option = document.createElement("option");
-				option.text = arr[i];
-				option.value = arr[i];
-				doc.appendChild(option);
-			}
-		},
-		type: 'GET'
-	});
-}
-
-retrieveBrainRegionCellTypeValues("brain_region_1");
-retrieveBrainRegionCellTypeValues("cell_type_1");
-
-retrieveBrainRegionCellTypeValues("brain_region_2");
-retrieveBrainRegionCellTypeValues("cell_type_2");
-
-retrieveBrainRegionCellTypeValues("brain_region_3");
-retrieveBrainRegionCellTypeValues("cell_type_3"); */
 

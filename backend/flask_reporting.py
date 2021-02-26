@@ -26,6 +26,7 @@ listOfPvecNeuronInfo = []
 listOfFiles = []
 dictGroupNeurons = {}
 
+
 @app.route('/', methods=['GET'])
 def get():
     return "Summary Reporting Main Route"
@@ -81,7 +82,7 @@ def getChunkedNeuronData(typeOfData, payload, fileName):
     log.info('Get Chunked Neuron Data - Start')
     jsonPayload = json.dumps(payload)
     headers = {"content-type":"application/json"} 
-    neuronIds = requests.post("http://cng.gmu.edu:8080/searchServiceReview/metadata/neuronIds", headers = headers, data=jsonPayload)
+    neuronIds = requests.post(config.searchserviceurl + "metadata/neuronIds", headers = headers, data=jsonPayload)
     neuronJsonData = json.loads(neuronIds.text)
     neuronIdsLength = len(neuronJsonData)
 
