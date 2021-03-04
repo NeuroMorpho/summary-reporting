@@ -2,6 +2,8 @@ Summary Reporting
 =================
 General description
 -------------------
+This tool may be accessed online at: http://cng.gmu.edu:8080/neuronMetadata/
+
 Generates summary report based on the selection of the type of report: Neurons grouped by metadata, persistence vectors, or morphometrics. It is also possible to download all reports together in a zip file. 
 
 Reports can be generated based on any combination of the following filters: Species, Gender, Minimum Weight, Maximum Weight, Development, Minimum Age, Maximum Age, Brain Regions, Cell Types, Structural Domain, Physical Integrity, Morphological Attributes, Protocol, Experiment Condition, Stain, Stain Thickness, Slicing Direction, Reconstruction Software, Objective Type, Objective Magnification, Archive, PMID, Original Format, Date of Deposition, and Date of Upload.
