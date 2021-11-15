@@ -8,7 +8,7 @@ Generates summary report based on the selection of the type of report: Neurons g
 
 Reports can be generated based on any combination of the following filters: Species, Gender, Minimum Weight, Maximum Weight, Development, Minimum Age, Maximum Age, Brain Regions, Cell Types, Structural Domain, Physical Integrity, Morphological Attributes, Protocol, Experiment Condition, Stain, Stain Thickness, Slicing Direction, Reconstruction Software, Objective Type, Objective Magnification, Archive, PMID, Original Format, Date of Deposition, and Date of Upload.
 
-For further information, please see [link to published article]
+For further information, please see [Efficient metadata mining of web-accessible neural morphologies](https://doi.org/10.1016/j.pbiomolbio.2021.05.005).
 
 Module descriptions and limitations of use
 ------------------------------------------
