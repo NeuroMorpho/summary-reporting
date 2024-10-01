@@ -1,11 +1,11 @@
 # our base image
-FROM ubuntu:bionic
+FROM ubuntu:18.04
 
 # Install python and pip
 LABEL author="Bengt Ljungquist"
 
 RUN apt-get update -y && \
-    apt-get install -y python3-pip python3-dev
+     apt-get install -y python3-pip python3-dev
 
 
 # install Python modules needed by the Python app

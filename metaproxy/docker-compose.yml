@@ -1,0 +1,10 @@
+name: metaproxy
+
+services:
+  swcpvec:
+    image: metaproxy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+        - "5005:5000"
