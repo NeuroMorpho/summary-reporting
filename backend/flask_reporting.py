@@ -31,6 +31,40 @@ dictGroupNeurons = {}
 def get():
     return "Summary Reporting Main Route"
 
+
+@app.route('/checkdbconn/', methods=['GET'])
+def check_db_connection():
+    """Check database connection status for debugging."""
+    try:
+        mydb = mysql.connector.connect(
+            host=config.dbhost,
+            user=config.dbuser,
+            passwd=config.dbpass,
+            database=config.dbsel,
+            port=config.dbport
+        )
+        cursor = mydb.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        cursor.close()
+        mydb.close()
+        return jsonify({
+            "status": "connected",
+            "host": config.dbhost,
+            "database": config.dbsel,
+            "port": config.dbport
+        })
+    except mysql.connector.Error as error:
+        return jsonify({
+            "status": "error",
+            "host": config.dbhost,
+            "database": config.dbsel,
+            "port": config.dbport,
+            "user": config.dbuser,
+            "password": config.dbpass,
+            "error": str(error)
+        }), 500
+
 #This method is responsible for sending back the final csv report file.
 @app.route('/generateReport/download/<typeOfDat>', methods=['GET'])
 def download_file(typeOfDat):

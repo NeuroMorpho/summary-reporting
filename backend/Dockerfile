@@ -1,8 +1,8 @@
 # our base image
-FROM ubuntu
+FROM ubuntu:22.04
 
 # Install python and pip
-MAINTAINER Navy Merianda "navymerianda@gmail.com"
+LABEL maintainer=["Navy Merianda <navymerianda@gmail.com>","Bengt Ljungquist <bengt@ljungquist.info>"]
 
 RUN apt-get update -y && \
     apt-get install -y python3-pip python3-dev libopenblas-base libomp-dev

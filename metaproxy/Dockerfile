@@ -1,5 +1,5 @@
 # our base image
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 # Install python and pip
 LABEL author="Bengt Ljungquist"
@@ -17,6 +17,7 @@ RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
 # copy files required for the app to run
 COPY app.py /app/
+COPY config.py /app/
 
 ENTRYPOINT [ "flask" ]
 

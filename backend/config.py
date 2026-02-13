@@ -3,9 +3,9 @@ sshport = 22
 sshusername = ''
 sshpass = ''
 
-dbhost = ''
-dbuser = ''
-dbpass = ''
-dbsel = ''
+dbhost = 'mysql'
+dbuser = 'bengt'
+dbpass = '100dbtest'
+dbsel = 'NeuMO'
 dbport = 3306
-searchserviceurl =  'http://cng.gmu.edu:8080/searchServiceReview/' # base searchservice url, change if deployed elsewhere
+searchserviceurl =  'https://neuromorpho.org/search/' # base searchservice url, change if deployed elsewhere

@@ -9,9 +9,9 @@ $('.ui.dropdown').dropdown();
 var metaDataObj = {}, neuron = {}, results = [], pvecResults = [], morphoResults = [],
 	selectedDownloadValue = "0", viewClick = true;
 
-var baseurl = 'http://cng.gmu.edu:8080/'; // baseurl for CNG server, modify if deployed elsewhere
-var appbaseurl = 'http://cng-nmo-main.orc.gmu.edu/'; // baseurl for app server, modify if deployed elsewhere
-var apiurl = 'http://neuromorpho.org/api/'; //baseurl for NeuroMorpho API, modify if deployed elsewhere
+var appbaseurl = 'https://neuromorpho.org/summary-reporting/'; // baseurl for app server, modify if deployed elsewhere
+var apiurl = 'https://neuromorpho.org/api/'; //baseurl for NeuroMorpho API, modify if deployed elsewhere
+var metaproxyurl = 'https://neuromorpho.org/metaproxy/'; // baseurl for metaproxy server, modify if deployed elsewhere
 
 new ClipboardJS('.btn');
 
@@ -112,18 +112,18 @@ function getMetaData() {
 				else {
 					tempArr = []
 					$('#' + this.id).find("option:selected").each(function (index, sel) {
-                       tempArr.push($(sel).text());
-                    });
+						tempArr.push($(sel).text());
+					});
 					if (this.id === "Physical_Integrity") {
 						neuron["physical_integrity"] = tempArr
 					}
 					else if (this.id === "reference_pmid") {
 						neuron["pmid"] = tempArr
 					}
-					else if (this.id === "attributes"){
+					else if (this.id === "attributes") {
 						neuron["morphological_attributes"] = tempArr
 					}
-					else{
+					else {
 						neuron[this.id] = tempArr;
 					}
 				}
@@ -143,7 +143,7 @@ var getCount = function () {
 	metaDataObj = getMetaData();
 
 	$.ajax({
-		url: baseurl + 'searchServiceReview/metadata/count',
+		url: 'https://neuromorpho.org/search/metadata/count',
 		error: function () {
 			$('#info').html('<p>An error has occurred<div class="scrolling content"></p>');
 		},
@@ -178,18 +178,18 @@ var gethits = function () {
 				else {
 					tempArr = []
 					$('#' + this.id).find("option:selected").each(function (index, sel) {
-		               tempArr.push($(sel).text());
-		            });
+						tempArr.push($(sel).text());
+					});
 					if (this.id === "Physical_Integrity") {
 						neuron["physical_integrity"] = tempArr
 					}
 					else if (this.id === "reference_pmid") {
 						neuron["pmid"] = tempArr
 					}
-					else if (this.id === "attributes"){
+					else if (this.id === "attributes") {
 						neuron["morphological_attributes"] = tempArr
 					}
-					else{
+					else {
 						neuron[this.id] = tempArr;
 					}
 				}
@@ -208,7 +208,7 @@ var gethits = function () {
 
 	if (viewClick) {
 		$.ajax({
-			url: baseurl + 'searchServiceReview/metadata/neuronIds',
+			url: 'https://neuromorpho.org/search/metadata/neuronIds',
 			error: function () {
 				$('#info').html('<p>An error has occurred<div class="scrolling content"></p>');
 			},
@@ -257,10 +257,10 @@ var gethits = function () {
 	}
 
 	else {
-		
+
 		//End-point for generating report - deployed in a docker container
 		var promise = $.ajax({
-			url:  appbaseurl + 'genRepNew/generateReport',
+			url: appbaseurl + 'generateReport',
 			dataType: "json",
 			contentType: 'application/json',
 			type: 'GET',
@@ -280,13 +280,13 @@ var gethits = function () {
 		//Retrieve the report based on the option selected - groups, morpho or pvec.
 		promise.then(function (data) {
 			if (selectedDownloadValue == "Groups")
-				window.location = appbaseurl + 'genRepNew/generateReport/download/groups_' + timestamp + '.csv'
+				window.location = appbaseurl + 'generateReport/download/groups_' + timestamp + '.csv'
 			else if (selectedDownloadValue == "Morphometrics")
-				window.location = appbaseurl + 'genRepNew/generateReport/download/morpho_' + timestamp + '.csv'
+				window.location = appbaseurl + 'generateReport/download/morpho_' + timestamp + '.csv'
 			else if (selectedDownloadValue == "Persistence Vectors")
-				window.location = appbaseurl + 'genRepNew/generateReport/download/pvec_' + timestamp + '.csv'
+				window.location = appbaseurl + 'generateReport/download/pvec_' + timestamp + '.csv'
 			else if (selectedDownloadValue == "All")
-				window.location = appbaseurl + 'genRepNew/generateReport/download/all_' + timestamp + '.zip'
+				window.location = appbaseurl + 'generateReport/download/all_' + timestamp + '.zip'
 
 			$("#download").html('Download');
 
@@ -300,7 +300,7 @@ var gethits = function () {
 //Create csv structure to be displayed in the view option.
 function createCSV(data) {
 
-	keys = ["archive", "species", "strain", "min_age", "max_age", "age_scale", "min_weight", "max_weight", "age_classification", "gender", "brain_region", "cell_type", "original_format", "protocol", "slicing_thickness", "slicing_direction", "stain", "magnification", "objective_type", "reconstruction_software", "note", "experiment_condition", "deposition_date", "upload_date", "reference_pmid", "reference_doi", "shrinkage_reported", "shrinkage_corrected", "reported_value", "reported_xy", "reported_z", "corrected_value", "corrected_xy", "corrected_z", "physical_Integrity"];
+	keys = ["archive", "species", "strain", "min_age", "max_age", "age_scale", "min_weight", "max_weight", "age_classification", "gender", "brain_region_1", "brain_region_2", "brain_region_3", "cell_type_1", "cell_type_2", "cell_type_3", "original_format", "protocol", "slicing_thickness", "slicing_direction", "stain", "magnification", "objective_type", "reconstruction_software", "note", "experiment_condition", "deposition_date", "upload_date", "reference_pmid", "reference_doi", "shrinkage_reported", "shrinkage_corrected", "reported_value", "reported_xy", "reported_z", "corrected_value", "corrected_xy", "corrected_z", "physical_Integrity"];
 
 
 	var result = '<table class="ui definition table" id="groupTable" style="display: none"><thead><tr>';
@@ -467,13 +467,13 @@ function getMorphoForNeurons(ids) {
 var fieldvals = {};
 function generatefieldvalues() {
 	$.ajax({
-		url: appbaseurl + 'metaproxy/',
+		url: metaproxyurl,
 		error: function () {
 			$('#info').html('<p>An error has occurred</p>');
 		},
 		success: function (data) {
 			fieldvals = JSON.parse(data);
-			var datakeys = Object.keys(fieldvals);			
+			var datakeys = Object.keys(fieldvals);
 			for (var i = 0; i < datakeys.length; i++) {
 				var doc = document.getElementById(datakeys[i]);
 				arr = fieldvals[datakeys[i]].fields
