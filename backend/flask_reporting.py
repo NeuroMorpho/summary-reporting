@@ -5,6 +5,8 @@ from flask import jsonify
 from flask_cors import CORS, cross_origin
 from flask import request
 import json, requests, os
+import threading
+import time
 import xml.etree.ElementTree as ET
 import classNeuron
 from flask import send_file
@@ -65,6 +67,202 @@ def check_db_connection():
             "error": str(error)
         }), 500
 
+FIELD_HIERARCHY = {
+    'brain_region_2': ('brainRegion', 'brainRegion_neuron', 'brainRegionId', 'brainRegionLevel', 2, 1),
+    'brain_region_3': ('brainRegion', 'brainRegion_neuron', 'brainRegionId', 'brainRegionLevel', 3, 2),
+    'cell_type_2': ('cellType', 'cellType_neuron', 'cellTypeId', 'cellTypeLevel', 2, 1),
+    'cell_type_3': ('cellType', 'cellType_neuron', 'cellTypeId', 'cellTypeLevel', 3, 2),
+}
+
+# The parent -> child map is small and near-static, but deriving it per request costs
+# 6-50s of MySQL time (a broad parent such as cell type 'principal cell' matches over half
+# the database). Build it once per field and serve the dropdowns from memory.
+HIERARCHY_CACHE_TTL = 86400
+
+_hierarchy_cache = {}
+_hierarchy_cache_expiry = {}
+_hierarchy_lock = threading.Lock()
+
+
+def load_hierarchy(child_field):
+    """Builds {parent_name: [child_name, ...]} for one child field."""
+    table, link_table, id_col, level_col, child_level, parent_level = \
+        FIELD_HIERARCHY[child_field]
+
+    mydb = mysql.connector.connect(
+        host=config.dbhost,
+        user=config.dbuser,
+        passwd=config.dbpass,
+        database=config.dbsel,
+        port=config.dbport
+    )
+    cursor = mydb.cursor()
+    query = f"""
+        SELECT DISTINCT parent_t.name, child_t.name
+        FROM {link_table} parent_lt
+        JOIN {table} parent_t
+            ON parent_t.id = parent_lt.{id_col}
+            AND parent_lt.{level_col} = %s
+        JOIN {link_table} child_lt
+            ON child_lt.neuronId = parent_lt.neuronId
+            AND child_lt.{level_col} = %s
+        JOIN {table} child_t
+            ON child_t.id = child_lt.{id_col}
+    """
+    cursor.execute(query, (parent_level, child_level))
+
+    hierarchy = {}
+    for parent_name, child_name in cursor.fetchall():
+        hierarchy.setdefault(parent_name, set()).add(child_name)
+
+    cursor.close()
+    mydb.close()
+
+    return {parent: sorted(children) for parent, children in hierarchy.items()}
+
+
+def get_hierarchy(child_field):
+    with _hierarchy_lock:
+        expiry = _hierarchy_cache_expiry.get(child_field, 0)
+        if child_field not in _hierarchy_cache or time.time() > expiry:
+            log.info('Loading hierarchy for ' + child_field)
+            _hierarchy_cache[child_field] = load_hierarchy(child_field)
+            _hierarchy_cache_expiry[child_field] = time.time() + HIERARCHY_CACHE_TTL
+        return _hierarchy_cache[child_field]
+
+
+def parse_parent_values(raw_values, known_parents):
+    """Accepts repeated parent_values params, and comma-joined ones from older clients.
+    A name that is itself a known parent is never split, so values containing a comma
+    (e.g. 'type I (monopolar dendrites, multipolar axon)') survive the round trip."""
+    parent_values = []
+    for raw in raw_values:
+        raw = raw.strip()
+        if not raw:
+            continue
+        if raw in known_parents or ',' not in raw:
+            parent_values.append(raw)
+        else:
+            parent_values.extend(v.strip() for v in raw.split(',') if v.strip())
+    return parent_values
+
+
+@app.route('/fields/<child_field>', methods=['GET'])
+def get_filtered_fields(child_field):
+    """Returns child field values filtered by parent selection."""
+    if child_field not in FIELD_HIERARCHY:
+        return jsonify({"field_name": child_field, "fields": [],
+                        "error": "Unknown child field"})
+
+    raw_values = request.args.getlist('parent_values')
+    if not raw_values:
+        return jsonify({"field_name": child_field, "fields": [],
+                        "error": "parent_values required"})
+
+    try:
+        hierarchy = get_hierarchy(child_field)
+    except mysql.connector.Error as error:
+        print(f"MySQL error for filtered {child_field}: {error}")
+        return jsonify({
+            "field_name": child_field,
+            "fields": [],
+            "error": str(error)
+        })
+
+    parent_values = parse_parent_values(raw_values, hierarchy)
+    if not parent_values:
+        return jsonify({"field_name": child_field, "fields": []})
+
+    fields = set()
+    for parent in parent_values:
+        fields.update(hierarchy.get(parent, []))
+
+    return jsonify({
+        "field_name": child_field,
+        "fields": sorted(fields)
+    })
+
+
+# Neuron selection
+#
+# The search service indexes a single PMID per neuron, so a PMID filter sent there misses
+# every neuron whose paper is listed second or later - and some neurons are indexed under
+# the wrong paper altogether. neuron_article holds one row per neuron and paper, so PMID
+# filters are resolved here and only the remaining filters go to the search service.
+
+def pmid_neuron_ids(pmids):
+    """Ids of the neurons linked to any of the given PMIDs (integers)."""
+    if not pmids:
+        return set()
+    mydb = mysql.connector.connect(
+        host=config.dbhost,
+        user=config.dbuser,
+        passwd=config.dbpass,
+        database=config.dbsel,
+        port=config.dbport
+    )
+    try:
+        cursor = mydb.cursor()
+        placeholders = ','.join(['%s'] * len(pmids))
+        cursor.execute(
+            f"SELECT DISTINCT neuron_id FROM neuron_article WHERE PMID IN ({placeholders})",
+            tuple(pmids))
+        return {row[0] for row in cursor.fetchall()}
+    finally:
+        mydb.close()
+
+
+def search_service_neuron_ids(payload):
+    response = requests.post(config.searchserviceurl + "metadata/neuronIds", json=payload)
+    response.raise_for_status()
+    return response.json()
+
+
+def search_service_count(payload):
+    response = requests.post(config.searchserviceurl + "metadata/count", json=payload)
+    response.raise_for_status()
+    return response.json()
+
+
+def split_pmid_filter(payload):
+    """Returns the PMID filter as integers and a copy of the payload without it.
+    Values that are not integers are dropped."""
+    rest = deepcopy(payload)
+    pmids = []
+    for value in rest.get('neuron', {}).pop('pmid', None) or []:
+        try:
+            pmids.append(int(value))
+        except (TypeError, ValueError):
+            continue
+    return pmids, rest
+
+
+def resolve_neuron_ids(payload):
+    """Ids of the neurons matching a filter payload as built by the frontend."""
+    pmids, rest = split_pmid_filter(payload)
+    if not pmids:
+        return [int(neuron_id) for neuron_id in search_service_neuron_ids(rest)]
+    by_pmid = pmid_neuron_ids(pmids)
+    if not rest.get('neuron'):
+        return sorted(by_pmid)
+    return [neuron_id for neuron_id in (int(i) for i in search_service_neuron_ids(rest))
+            if neuron_id in by_pmid]
+
+
+@app.route('/neuronIds', methods=['POST'])
+def neuron_ids():
+    return jsonify(resolve_neuron_ids(request.get_json(force=True)))
+
+
+@app.route('/count', methods=['POST'])
+def neuron_count():
+    payload = request.get_json(force=True)
+    pmids, rest = split_pmid_filter(payload)
+    if not pmids:
+        return jsonify(search_service_count(rest))
+    return jsonify(len(resolve_neuron_ids(payload)))
+
+
 #This method is responsible for sending back the final csv report file.
 @app.route('/generateReport/download/<typeOfDat>', methods=['GET'])
 def download_file(typeOfDat):
@@ -114,10 +312,7 @@ def get_reports_xls():
 #Splitting/Chunking the data for groups, morpho and pvec and adding the csv files to the list.
 def getChunkedNeuronData(typeOfData, payload, fileName):
     log.info('Get Chunked Neuron Data - Start')
-    jsonPayload = json.dumps(payload)
-    headers = {"content-type":"application/json"} 
-    neuronIds = requests.post(config.searchserviceurl + "metadata/neuronIds", headers = headers, data=jsonPayload)
-    neuronJsonData = json.loads(neuronIds.text)
+    neuronJsonData = resolve_neuron_ids(payload)
     neuronIdsLength = len(neuronJsonData)
 
     chunkSize = 20000

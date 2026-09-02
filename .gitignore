@@ -1,0 +1,8 @@
+.venv
+.vscode
+metaproxy/venv-metaproxy
+backend/.env
+metaproxy/__pycache__/
+metaproxy/nmoapi-cache.sqlite
+.claude/
+__pycache__/

@@ -10,6 +10,7 @@ var metaDataObj = {}, neuron = {}, results = [], pvecResults = [], morphoResults
 	selectedDownloadValue = "0", viewClick = true;
 
 var appbaseurl = 'https://neuromorpho.org/summary-reporting/'; // baseurl for app server, modify if deployed elsewhere
+//var appbaseurl = 'http://localhost:5006/'; // baseurl for app server, modify if deployed elsewhere
 var apiurl = 'https://neuromorpho.org/api/'; //baseurl for NeuroMorpho API, modify if deployed elsewhere
 var metaproxyurl = 'https://neuromorpho.org/metaproxy/'; // baseurl for metaproxy server, modify if deployed elsewhere
 
@@ -143,7 +144,7 @@ var getCount = function () {
 	metaDataObj = getMetaData();
 
 	$.ajax({
-		url: 'https://neuromorpho.org/search/metadata/count',
+		url: appbaseurl + 'count',
 		error: function () {
 			$('#info').html('<p>An error has occurred<div class="scrolling content"></p>');
 		},
@@ -208,7 +209,7 @@ var gethits = function () {
 
 	if (viewClick) {
 		$.ajax({
-			url: 'https://neuromorpho.org/search/metadata/neuronIds',
+			url: appbaseurl + 'neuronIds',
 			error: function () {
 				$('#info').html('<p>An error has occurred<div class="scrolling content"></p>');
 			},
@@ -321,9 +322,14 @@ function createCSV(data) {
 
 	for (var j = 0; j < keys.length; j++) {
 		result += "<tr>";
-		result = result + "<td>" + keys[j]; + "</td>";
+		result = result + "<td>" + keys[j] + "</td>";
+		// The API exposes brain_region / cell_type as arrays, one entry per level.
+		var level = /^(brain_region|cell_type)_([123])$/.exec(keys[j]);
 		for (var i = 0; i < data.length; i++) {
-			result = result + "<td>" + data[i][0][keys[j]] + "</td>";
+			var value = level
+				? (data[i][0][level[1]] || [])[level[2] - 1] || ""
+				: data[i][0][keys[j]];
+			result = result + "<td>" + value + "</td>";
 		}
 		result += "</tr>";
 	}
@@ -380,7 +386,7 @@ function createMorphoCSV(data) {
 	console.log(data.length);
 	for (var j = 0; j < keys.length; j++) {
 		result += "<tr>";
-		result = result + "<td>" + keys[j]; + "</td>";
+		result = result + "<td>" + keys[j] + "</td>";
 		for (var i = 0; i < data.length; i++) {
 			result = result + "<td>" + data[i][0][keys[j]] + "</td>";
 		}
@@ -476,7 +482,8 @@ function generatefieldvalues() {
 			var datakeys = Object.keys(fieldvals);
 			for (var i = 0; i < datakeys.length; i++) {
 				var doc = document.getElementById(datakeys[i]);
-				arr = fieldvals[datakeys[i]].fields
+				if (!doc) continue;
+				var arr = fieldvals[datakeys[i]].fields;
 				for (var j = 0; j < arr.length; j++) {
 					var option = document.createElement("option");
 					option.text = arr[j];
@@ -490,6 +497,95 @@ function generatefieldvalues() {
 }
 
 generatefieldvalues();
+
+// Cascading dropdown helpers
+
+//Replaces a dropdown's options. Semantic UI keeps the selected label chips on the
+//wrapper div, so 'clear' is required as well - dropping the options alone would leave
+//a chip on screen whose value is no longer part of the query.
+function setDropdownOptions(fieldId, values) {
+	var doc = document.getElementById(fieldId);
+	if (!doc) return;
+	$('#' + fieldId).dropdown('clear');
+	while (doc.options.length > 1) {
+		doc.remove(1);
+	}
+	for (var j = 0; j < values.length; j++) {
+		var option = document.createElement("option");
+		option.text = values[j];
+		option.value = values[j];
+		doc.appendChild(option);
+	}
+	$('#' + fieldId).dropdown('refresh');
+}
+
+//Restores the unfiltered list from the metaproxy. Semantic UI refuses to open a dropdown
+//with no items at all, so a child must never be left empty when it has no parent selection.
+function clearDropdown(fieldId) {
+	setDropdownOptions(fieldId, (fieldvals[fieldId] && fieldvals[fieldId].fields) || []);
+}
+
+var fetchToken = {};
+function fetchAndPopulateDropdown(childFieldId, parentValues) {
+	if (!parentValues || parentValues.length === 0) {
+		clearDropdown(childFieldId);
+		return;
+	}
+	var $wrapper = $('#' + childFieldId).closest('.ui.dropdown');
+	$wrapper.addClass('loading disabled');
+	var token = fetchToken[childFieldId] = (fetchToken[childFieldId] || 0) + 1;
+	$.ajax({
+		// One param per value - a field value may itself contain a comma.
+		url: appbaseurl + 'fields/' + childFieldId + '?' + $.param({ parent_values: parentValues }, true),
+		timeout: 60000,
+		error: function () {
+			if (token !== fetchToken[childFieldId]) return;
+			$('#info').html('<p>Could not load values for ' + childFieldId + ' - please try again</p>');
+		},
+		success: function (data) {
+			// A slower earlier request must not overwrite the values of a later selection.
+			if (token !== fetchToken[childFieldId]) return;
+			var result = typeof data === 'string' ? JSON.parse(data) : data;
+			setDropdownOptions(childFieldId, result.fields || []);
+		},
+		complete: function () {
+			if (token === fetchToken[childFieldId]) {
+				$wrapper.removeClass('loading disabled');
+			}
+		},
+		type: 'GET'
+	});
+}
+
+function getDropdownValues(fieldId) {
+	var selected = $('#' + fieldId).dropdown('get value');
+	if (Array.isArray(selected)) return selected.filter(function (v) { return v !== ''; });
+	if (typeof selected === 'string' && selected !== '') return selected.split(',').filter(function (v) { return v !== ''; });
+	return [];
+}
+
+// Cascading change listeners — set up after Semantic UI initialization
+$(document).ready(function () {
+	// brain_region_1 -> brain_region_2 -> brain_region_3
+	$('#brain_region_1').on('change', function () {
+		clearDropdown('brain_region_3');
+		fetchAndPopulateDropdown('brain_region_2', getDropdownValues('brain_region_1'));
+	});
+
+	$('#brain_region_2').on('change', function () {
+		fetchAndPopulateDropdown('brain_region_3', getDropdownValues('brain_region_2'));
+	});
+
+	// cell_type_1 -> cell_type_2 -> cell_type_3
+	$('#cell_type_1').on('change', function () {
+		clearDropdown('cell_type_3');
+		fetchAndPopulateDropdown('cell_type_2', getDropdownValues('cell_type_1'));
+	});
+
+	$('#cell_type_2').on('change', function () {
+		fetchAndPopulateDropdown('cell_type_3', getDropdownValues('cell_type_2'));
+	});
+});
 
 
 /*$(".retrieve-fields").each(function () {

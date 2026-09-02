@@ -9,18 +9,20 @@ services:
     ports:
         - "5005:5000"
   backend:
+    image: neuromorpho/summaryreporting-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
         - "5006:5000"
+    env_file:
+        - ./backend/.env
+    networks:
+        default:
+        similarity-search_default:
+    external_links:
+        - "similarity-search-mysql-1:db"
 
-  db:
-    image: mysql:5.5.54
-    environment:
-      MYSQL_ROOT_PASSWORD: 100%db
-      MYSQL_DATABASE: NeuMO
-    volumes:
-      - /data/dbs/gmu/NeuMO:/var/lib/mysql
-    ports:
-      - "3306:3306"
+networks:
+    similarity-search_default:
+        external: true
